@@ -11,53 +11,58 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Form {
-                Section("Startup") {
-                    Toggle("Launch at Login", isOn: $launchAtLoginEnabled)
-                        .onChange(of: launchAtLoginEnabled) { _, newValue in
-                            setLaunchAtLogin(newValue)
-                        }
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    SettingsCard(title: "Startup") {
+                        Toggle("Launch at Login", isOn: $launchAtLoginEnabled)
+                            .onChange(of: launchAtLoginEnabled) { _, newValue in
+                                setLaunchAtLogin(newValue)
+                            }
+                    }
 
-                Section("Root Folder") {
-                    HStack {
-                        Text(settings.rootFolder.path)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                        Button("Choose…") { chooseRootFolder() }
-                        Spacer()
+                    SettingsCard(title: "Root Folder") {
+                        HStack(spacing: 10) {
+                            Text(settings.rootFolder.path)
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                            Spacer(minLength: 8)
+                            Button("Choose…") { chooseRootFolder() }
+                        }
+                    }
+
+                    SettingsCard(title: "Folder Name") {
+                        TextField("", text: Binding(
+                            get: { settings.folderNameTemplate },
+                            set: { settings.folderNameTemplate = $0 }
+                        ), prompt: Text("{YYYY}-{MM}-{DD} {title}"))
+                        .textFieldStyle(.roundedBorder)
+
+                        FilterListEditor(filters: Binding(
+                            get: { settings.folderNameFilters },
+                            set: { settings.folderNameFilters = $0 }
+                        ))
+                    }
+
+                    SettingsCard(title: "Filename") {
+                        TextField("", text: Binding(
+                            get: { settings.filenameTemplate },
+                            set: { settings.filenameTemplate = $0 }
+                        ), prompt: Text("{hh}-{mm}-{ss}.png"))
+                        .textFieldStyle(.roundedBorder)
+                    }
+
+                    SettingsCard(title: "Hotkey") {
+                        HotKeyRecorderView(hotKey: Binding(
+                            get: { settings.hotKey },
+                            set: { settings.hotKey = $0 }
+                        ))
                     }
                 }
-
-                Section("Folder Name") {
-                    TextField("Template", text: Binding(
-                        get: { settings.folderNameTemplate },
-                        set: { settings.folderNameTemplate = $0 }
-                    ))
-                    .textFieldStyle(.roundedBorder)
-
-                    FilterListEditor(filters: Binding(
-                        get: { settings.folderNameFilters },
-                        set: { settings.folderNameFilters = $0 }
-                    ))
-                }
-
-                Section("Filename") {
-                    TextField("Template", text: Binding(
-                        get: { settings.filenameTemplate },
-                        set: { settings.filenameTemplate = $0 }
-                    ))
-                    .textFieldStyle(.roundedBorder)
-                }
-
-                Section("Hotkey") {
-                    HotKeyRecorderView(hotKey: Binding(
-                        get: { settings.hotKey },
-                        set: { settings.hotKey = $0 }
-                    ))
-                }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(20)
 
             Divider()
 
@@ -68,7 +73,7 @@ struct SettingsView: View {
             }
             .padding(12)
         }
-        .frame(width: 420)
+        .frame(width: 440, height: 560)
     }
 
     private func closeWindow() {
@@ -98,5 +103,26 @@ struct SettingsView: View {
         if panel.runModal() == .OK, let url = panel.url {
             settings.rootFolder = url
         }
+    }
+}
+
+private struct SettingsCard<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 10) {
+                content
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

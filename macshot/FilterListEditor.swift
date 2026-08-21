@@ -7,11 +7,11 @@ struct FilterListEditor: View {
         VStack(alignment: .leading, spacing: 6) {
             ForEach($filters) { $filter in
                 HStack {
-                    TextField("search", text: $filter.search)
+                    TextField("", text: $filter.search, prompt: Text("search"))
                         .textFieldStyle(.roundedBorder)
                     Image(systemName: "arrow.right")
                         .foregroundStyle(.secondary)
-                    TextField("replace", text: $filter.replace)
+                    TextField("", text: $filter.replace, prompt: Text("replace"))
                         .textFieldStyle(.roundedBorder)
                     Button {
                         filters.removeAll { $0.id == filter.id }
