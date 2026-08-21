@@ -6,8 +6,14 @@ enum WindowCaptureError: Error {
     case encodingFailed
 }
 
+struct WindowCaptureResult {
+    let png: Data
+    let title: String
+    let appName: String
+}
+
 enum WindowCapture {
-    static func captureFocusedWindowPNG() async throws -> Data {
+    static func captureFocusedWindow() async throws -> WindowCaptureResult {
         guard let frontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier else {
             throw WindowCaptureError.noFocusedWindow
         }
@@ -35,6 +41,11 @@ enum WindowCapture {
         guard let png = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else {
             throw WindowCaptureError.encodingFailed
         }
-        return png
+
+        return WindowCaptureResult(
+            png: png,
+            title: window.title ?? "",
+            appName: window.owningApplication?.applicationName ?? ""
+        )
     }
 }

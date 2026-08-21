@@ -1,28 +1,42 @@
 import Carbon.HIToolbox
 import Foundation
 
-/// Registers one global hotkey via Carbon's RegisterEventHotKey.
-/// Multiple hotkeys / user-configurable binding land in Milestone 3.
+/// Registers one global hotkey via Carbon's RegisterEventHotKey, and lets
+/// the binding be changed later (e.g. when the user picks a new one in
+/// Settings) without reinstalling the event handler.
 final class HotKeyManager {
     private var hotKeyRef: EventHotKeyRef?
     private var eventHandler: EventHandlerRef?
     private let onTrigger: () -> Void
+    private let hotKeyID = EventHotKeyID(signature: OSType(UInt32(bitPattern: 0x6D637368)), id: 1) // 'mcsh'
 
-    init(keyCode: UInt32, modifiers: UInt32, onTrigger: @escaping () -> Void) {
+    init(onTrigger: @escaping () -> Void) {
         self.onTrigger = onTrigger
-        register(keyCode: keyCode, modifiers: modifiers)
+        installHandler()
     }
 
     deinit {
-        if let hotKeyRef {
-            UnregisterEventHotKey(hotKeyRef)
-        }
+        unregister()
         if let eventHandler {
             RemoveEventHandler(eventHandler)
         }
     }
 
-    private func register(keyCode: UInt32, modifiers: UInt32) {
+    func update(keyCode: UInt32, modifiers: UInt32) {
+        unregister()
+        var ref: EventHotKeyRef?
+        RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &ref)
+        hotKeyRef = ref
+    }
+
+    private func unregister() {
+        if let hotKeyRef {
+            UnregisterEventHotKey(hotKeyRef)
+        }
+        hotKeyRef = nil
+    }
+
+    private func installHandler() {
         var eventType = EventTypeSpec(
             eventClass: OSType(kEventClassKeyboard),
             eventKind: OSType(kEventHotKeyPressed)
@@ -35,8 +49,5 @@ final class HotKeyManager {
             Unmanaged<HotKeyManager>.fromOpaque(userData).takeUnretainedValue().onTrigger()
             return noErr
         }, 1, &eventType, selfPtr, &eventHandler)
-
-        let hotKeyID = EventHotKeyID(signature: OSType(UInt32(bitPattern: 0x6D637368)), id: 1) // 'mcsh'
-        RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef)
     }
 }

@@ -7,8 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0134B34F554D89ACEB6163FC /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A11E2E76AF0E1B1CEFA8D7 /* AppSettings.swift */; };
+		2298F37A4CD71FEC897F5971 /* HotKeyFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF070ADE301CDE0C1B11902 /* HotKeyFormatter.swift */; };
+		24544D806AC1FE38E09200D7 /* TemplateRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80CB3762606705BEC73D3BD /* TemplateRenderer.swift */; };
 		26D26950A781B3D0017F48BB /* MenuBarMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E53F1DDF9508AE693A647CD /* MenuBarMenu.swift */; };
+		6DF77BF8ED434B5250CC4C46 /* FilterListEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74ABCEA5E7856946A32BF2A6 /* FilterListEditor.swift */; };
 		7DCE55007A18417C9CEF05F7 /* WindowCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 258E7297A233F4B5F101B773 /* WindowCapture.swift */; };
+		B31E0633C6BDA6322691ED3D /* HotKeyRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5758D659DEADE5A68FBBED9 /* HotKeyRecorderView.swift */; };
 		B522921DE6E868B1C2D8CCD5 /* CaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C7809C8927E28D7B93B2A6 /* CaptureController.swift */; };
 		C764A9EE8D1CC55A02A1F11C /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221CDB563525672BB244295 /* HotKeyManager.swift */; };
 		D66C7C239D7E7F283C0F6321 /* ScreenRecordingPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6294675B3D34D73EB2D4AF /* ScreenRecordingPermission.swift */; };
@@ -23,8 +28,13 @@
 		5221CDB563525672BB244295 /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
 		5DE3128230E9036FBD380270 /* macshotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macshotApp.swift; sourceTree = "<group>"; };
 		61C7809C8927E28D7B93B2A6 /* CaptureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureController.swift; sourceTree = "<group>"; };
+		74ABCEA5E7856946A32BF2A6 /* FilterListEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterListEditor.swift; sourceTree = "<group>"; };
 		88325E866EC073C3C2803424 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		93A11E2E76AF0E1B1CEFA8D7 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		C7A31BEF27A287B64D4FAF16 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D80CB3762606705BEC73D3BD /* TemplateRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateRenderer.swift; sourceTree = "<group>"; };
+		DEF070ADE301CDE0C1B11902 /* HotKeyFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyFormatter.swift; sourceTree = "<group>"; };
+		F5758D659DEADE5A68FBBED9 /* HotKeyRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyRecorderView.swift; sourceTree = "<group>"; };
 		FC6294675B3D34D73EB2D4AF /* ScreenRecordingPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRecordingPermission.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -48,13 +58,18 @@
 		C354F7A8141AB0C7F469CA39 /* macshot */ = {
 			isa = PBXGroup;
 			children = (
+				93A11E2E76AF0E1B1CEFA8D7 /* AppSettings.swift */,
 				61C7809C8927E28D7B93B2A6 /* CaptureController.swift */,
+				74ABCEA5E7856946A32BF2A6 /* FilterListEditor.swift */,
+				DEF070ADE301CDE0C1B11902 /* HotKeyFormatter.swift */,
 				5221CDB563525672BB244295 /* HotKeyManager.swift */,
+				F5758D659DEADE5A68FBBED9 /* HotKeyRecorderView.swift */,
 				C7A31BEF27A287B64D4FAF16 /* Info.plist */,
 				5DE3128230E9036FBD380270 /* macshotApp.swift */,
 				1E53F1DDF9508AE693A647CD /* MenuBarMenu.swift */,
 				FC6294675B3D34D73EB2D4AF /* ScreenRecordingPermission.swift */,
 				88325E866EC073C3C2803424 /* SettingsView.swift */,
+				D80CB3762606705BEC73D3BD /* TemplateRenderer.swift */,
 				258E7297A233F4B5F101B773 /* WindowCapture.swift */,
 			);
 			path = macshot;
@@ -118,11 +133,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0134B34F554D89ACEB6163FC /* AppSettings.swift in Sources */,
 				B522921DE6E868B1C2D8CCD5 /* CaptureController.swift in Sources */,
+				6DF77BF8ED434B5250CC4C46 /* FilterListEditor.swift in Sources */,
+				2298F37A4CD71FEC897F5971 /* HotKeyFormatter.swift in Sources */,
 				C764A9EE8D1CC55A02A1F11C /* HotKeyManager.swift in Sources */,
+				B31E0633C6BDA6322691ED3D /* HotKeyRecorderView.swift in Sources */,
 				26D26950A781B3D0017F48BB /* MenuBarMenu.swift in Sources */,
 				D66C7C239D7E7F283C0F6321 /* ScreenRecordingPermission.swift in Sources */,
 				EF92674A5CA5DBD59C7A2537 /* SettingsView.swift in Sources */,
+				24544D806AC1FE38E09200D7 /* TemplateRenderer.swift in Sources */,
 				7DCE55007A18417C9CEF05F7 /* WindowCapture.swift in Sources */,
 				E59DF32C352F74BF34D8BF9C /* macshotApp.swift in Sources */,
 			);
