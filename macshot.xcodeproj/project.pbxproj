@@ -18,10 +18,12 @@
 		C764A9EE8D1CC55A02A1F11C /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221CDB563525672BB244295 /* HotKeyManager.swift */; };
 		D66C7C239D7E7F283C0F6321 /* ScreenRecordingPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6294675B3D34D73EB2D4AF /* ScreenRecordingPermission.swift */; };
 		E59DF32C352F74BF34D8BF9C /* macshotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE3128230E9036FBD380270 /* macshotApp.swift */; };
+		E7A16AB773895DC101461979 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13387C4497B19524CAE53F36 /* Assets.xcassets */; };
 		EF92674A5CA5DBD59C7A2537 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88325E866EC073C3C2803424 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		13387C4497B19524CAE53F36 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1436CAA041F27245993D8316 /* macshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = macshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E53F1DDF9508AE693A647CD /* MenuBarMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarMenu.swift; sourceTree = "<group>"; };
 		258E7297A233F4B5F101B773 /* WindowCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowCapture.swift; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				93A11E2E76AF0E1B1CEFA8D7 /* AppSettings.swift */,
+				13387C4497B19524CAE53F36 /* Assets.xcassets */,
 				61C7809C8927E28D7B93B2A6 /* CaptureController.swift */,
 				74ABCEA5E7856946A32BF2A6 /* FilterListEditor.swift */,
 				DEF070ADE301CDE0C1B11902 /* HotKeyFormatter.swift */,
@@ -83,6 +86,7 @@
 			buildConfigurationList = A6AC124FAF417A66025659B2 /* Build configuration list for PBXNativeTarget "macshot" */;
 			buildPhases = (
 				23E7743A93A6AC8C780BC194 /* Sources */,
+				8415F804740CAFD75ADCEB86 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -127,6 +131,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8415F804740CAFD75ADCEB86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7A16AB773895DC101461979 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		23E7743A93A6AC8C780BC194 /* Sources */ = {
