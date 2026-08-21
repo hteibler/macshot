@@ -5,47 +5,62 @@ struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
 
     var body: some View {
-        Form {
-            Section("Root Folder") {
-                HStack {
-                    Text(settings.rootFolder.path)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                    Spacer()
-                    Button("Choose…") { chooseRootFolder() }
+        VStack(spacing: 0) {
+            Form {
+                Section("Root Folder") {
+                    HStack {
+                        Text(settings.rootFolder.path)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Spacer()
+                        Button("Choose…") { chooseRootFolder() }
+                    }
+                }
+
+                Section("Folder Name") {
+                    TextField("Template", text: Binding(
+                        get: { settings.folderNameTemplate },
+                        set: { settings.folderNameTemplate = $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+
+                    FilterListEditor(filters: Binding(
+                        get: { settings.folderNameFilters },
+                        set: { settings.folderNameFilters = $0 }
+                    ))
+                }
+
+                Section("Filename") {
+                    TextField("Template", text: Binding(
+                        get: { settings.filenameTemplate },
+                        set: { settings.filenameTemplate = $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                }
+
+                Section("Hotkey") {
+                    HotKeyRecorderView(hotKey: Binding(
+                        get: { settings.hotKey },
+                        set: { settings.hotKey = $0 }
+                    ))
                 }
             }
+            .padding(20)
 
-            Section("Folder Name") {
-                TextField("Template", text: Binding(
-                    get: { settings.folderNameTemplate },
-                    set: { settings.folderNameTemplate = $0 }
-                ))
-                .textFieldStyle(.roundedBorder)
+            Divider()
 
-                FilterListEditor(filters: Binding(
-                    get: { settings.folderNameFilters },
-                    set: { settings.folderNameFilters = $0 }
-                ))
+            HStack {
+                Spacer()
+                Button("Close") { closeWindow() }
+                    .keyboardShortcut(.defaultAction)
             }
-
-            Section("Filename") {
-                TextField("Template", text: Binding(
-                    get: { settings.filenameTemplate },
-                    set: { settings.filenameTemplate = $0 }
-                ))
-                .textFieldStyle(.roundedBorder)
-            }
-
-            Section("Hotkey") {
-                HotKeyRecorderView(hotKey: Binding(
-                    get: { settings.hotKey },
-                    set: { settings.hotKey = $0 }
-                ))
-            }
+            .padding(12)
         }
-        .padding(20)
         .frame(width: 420)
+    }
+
+    private func closeWindow() {
+        NSApp.keyWindow?.performClose(nil)
     }
 
     private func chooseRootFolder() {
