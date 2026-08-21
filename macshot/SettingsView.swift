@@ -1,19 +1,31 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
+import os.log
 
 struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
+    @State private var launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
+
+    private let log = Logger(subsystem: "at.teibler.macshot", category: "settings")
 
     var body: some View {
         VStack(spacing: 0) {
             Form {
+                Section("Startup") {
+                    Toggle("Launch at Login", isOn: $launchAtLoginEnabled)
+                        .onChange(of: launchAtLoginEnabled) { _, newValue in
+                            setLaunchAtLogin(newValue)
+                        }
+                }
+
                 Section("Root Folder") {
                     HStack {
                         Text(settings.rootFolder.path)
                             .lineLimit(1)
                             .truncationMode(.middle)
-                        Spacer()
                         Button("Choose…") { chooseRootFolder() }
+                        Spacer()
                     }
                 }
 
@@ -50,9 +62,9 @@ struct SettingsView: View {
             Divider()
 
             HStack {
-                Spacer()
                 Button("Close") { closeWindow() }
                     .keyboardShortcut(.defaultAction)
+                Spacer()
             }
             .padding(12)
         }
@@ -61,6 +73,19 @@ struct SettingsView: View {
 
     private func closeWindow() {
         NSApp.keyWindow?.performClose(nil)
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            log.error("Failed to \(enabled ? "register" : "unregister", privacy: .public) launch-at-login: \(String(describing: error), privacy: .public)")
+            launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
+        }
     }
 
     private func chooseRootFolder() {
