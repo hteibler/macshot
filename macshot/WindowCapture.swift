@@ -69,8 +69,14 @@ enum WindowCapture {
 
         let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
 
-        // No single owning window/app for a full-screen capture.
-        return WindowCaptureResult(png: try encodePNG(image), title: "", appName: "")
+        // No single owning window/app for a full-screen capture — use the
+        // screen's position in NSScreen.screens (1-based) as the title instead.
+        let screenIDs = NSScreen.screens.compactMap {
+            ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+        }
+        let screenNumber = (screenIDs.firstIndex(of: displayID) ?? 0) + 1
+
+        return WindowCaptureResult(png: try encodePNG(image), title: "Screen\(screenNumber)", appName: "")
     }
 
     private static func encodePNG(_ image: CGImage) throws -> Data {
