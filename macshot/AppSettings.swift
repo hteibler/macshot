@@ -28,6 +28,8 @@ final class AppSettings: ObservableObject {
         static let folderNameFilters = "folderNameFilters"
         static let filenameTemplate = "filenameTemplate"
         static let hotKey = "hotKey"
+        static let fullScreenHotKey = "fullScreenHotKey"
+        static let copyToClipboard = "copyToClipboard"
     }
 
     private static var defaultRootFolder: URL {
@@ -38,6 +40,12 @@ final class AppSettings: ObservableObject {
         keyCode: UInt32(kVK_ANSI_9),
         modifiers: UInt32(cmdKey | shiftKey),
         displayKey: "9"
+    )
+
+    private static let defaultFullScreenHotKey = HotKeyCombo(
+        keyCode: UInt32(kVK_ANSI_8),
+        modifiers: UInt32(cmdKey | shiftKey),
+        displayKey: "8"
     )
 
     // Persist before sending objectWillChange: subscribers (including our own
@@ -69,6 +77,16 @@ final class AppSettings: ObservableObject {
     var hotKey: HotKeyCombo {
         get { load(HotKeyCombo.self, key: Keys.hotKey) ?? Self.defaultHotKey }
         set { save(newValue, key: Keys.hotKey); objectWillChange.send() }
+    }
+
+    var fullScreenHotKey: HotKeyCombo {
+        get { load(HotKeyCombo.self, key: Keys.fullScreenHotKey) ?? Self.defaultFullScreenHotKey }
+        set { save(newValue, key: Keys.fullScreenHotKey); objectWillChange.send() }
+    }
+
+    var copyToClipboard: Bool {
+        get { defaults.bool(forKey: Keys.copyToClipboard) }
+        set { defaults.set(newValue, forKey: Keys.copyToClipboard); objectWillChange.send() }
     }
 
     private func save<T: Encodable>(_ value: T, key: String) {

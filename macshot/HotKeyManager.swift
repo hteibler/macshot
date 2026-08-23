@@ -4,14 +4,21 @@ import Foundation
 /// Registers one global hotkey via Carbon's RegisterEventHotKey, and lets
 /// the binding be changed later (e.g. when the user picks a new one in
 /// Settings) without reinstalling the event handler.
+///
+/// Each instance needs its own `id`: the keyboard event handler is
+/// installed on the shared application event target, so with more than one
+/// manager alive, every instance's handler receives every hotkey event —
+/// the `id` is how a handler tells "my hotkey fired" from "some other
+/// manager's did".
 final class HotKeyManager {
     private var hotKeyRef: EventHotKeyRef?
     private var eventHandler: EventHandlerRef?
     private let onTrigger: () -> Void
-    private let hotKeyID = EventHotKeyID(signature: OSType(UInt32(bitPattern: 0x6D637368)), id: 1) // 'mcsh'
+    private let hotKeyID: EventHotKeyID
 
-    init(onTrigger: @escaping () -> Void) {
+    init(id: UInt32, onTrigger: @escaping () -> Void) {
         self.onTrigger = onTrigger
+        self.hotKeyID = EventHotKeyID(signature: OSType(UInt32(bitPattern: 0x6D637368)), id: id) // 'mcsh'
         installHandler()
     }
 
@@ -44,9 +51,25 @@ final class HotKeyManager {
 
         let selfPtr = Unmanaged.passUnretained(self).toOpaque()
 
-        InstallEventHandler(GetApplicationEventTarget(), { _, _, userData in
-            guard let userData else { return noErr }
-            Unmanaged<HotKeyManager>.fromOpaque(userData).takeUnretainedValue().onTrigger()
+        InstallEventHandler(GetApplicationEventTarget(), { _, event, userData in
+            guard let event, let userData else { return noErr }
+
+            var receivedID = EventHotKeyID()
+            let status = GetEventParameter(
+                event,
+                EventParamName(kEventParamDirectObject),
+                EventParamType(typeEventHotKeyID),
+                nil,
+                MemoryLayout<EventHotKeyID>.size,
+                nil,
+                &receivedID
+            )
+            guard status == noErr else { return noErr }
+
+            let manager = Unmanaged<HotKeyManager>.fromOpaque(userData).takeUnretainedValue()
+            if receivedID.signature == manager.hotKeyID.signature && receivedID.id == manager.hotKeyID.id {
+                manager.onTrigger()
+            }
             return noErr
         }, 1, &eventType, selfPtr, &eventHandler)
     }

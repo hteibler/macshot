@@ -53,10 +53,29 @@ struct SettingsView: View {
                         .textFieldStyle(.roundedBorder)
                     }
 
-                    SettingsCard(title: "Hotkey") {
-                        HotKeyRecorderView(hotKey: Binding(
-                            get: { settings.hotKey },
-                            set: { settings.hotKey = $0 }
+                    SettingsCard(title: "Hotkeys") {
+                        HStack {
+                            Text("Window")
+                            Spacer()
+                            HotKeyRecorderView(hotKey: Binding(
+                                get: { settings.hotKey },
+                                set: { settings.hotKey = $0 }
+                            ))
+                        }
+                        HStack {
+                            Text("Full Screen")
+                            Spacer()
+                            HotKeyRecorderView(hotKey: Binding(
+                                get: { settings.fullScreenHotKey },
+                                set: { settings.fullScreenHotKey = $0 }
+                            ))
+                        }
+                    }
+
+                    SettingsCard(title: "Behavior") {
+                        Toggle("Copy to Clipboard", isOn: Binding(
+                            get: { settings.copyToClipboard },
+                            set: { settings.copyToClipboard = $0 }
                         ))
                     }
                 }
