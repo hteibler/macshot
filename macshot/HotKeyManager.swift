@@ -1,5 +1,6 @@
 import Carbon.HIToolbox
 import Foundation
+import os.log
 
 /// Registers one global hotkey via Carbon's RegisterEventHotKey, and lets
 /// the binding be changed later (e.g. when the user picks a new one in
@@ -11,6 +12,8 @@ import Foundation
 /// the `id` is how a handler tells "my hotkey fired" from "some other
 /// manager's did".
 final class HotKeyManager {
+    private static let log = Logger(subsystem: "at.teibler.macshot", category: "hotkey")
+
     private var hotKeyRef: EventHotKeyRef?
     private var eventHandler: EventHandlerRef?
     private let onTrigger: () -> Void
@@ -29,10 +32,17 @@ final class HotKeyManager {
         }
     }
 
+    /// `RegisterEventHotKey`'s status was previously discarded — a failed
+    /// registration (e.g. a combo already claimed by another app, or by
+    /// this app's *other* hotkey) meant the hotkey silently never fired
+    /// again, with no way to tell why. Now logged instead.
     func update(keyCode: UInt32, modifiers: UInt32) {
         unregister()
         var ref: EventHotKeyRef?
-        RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &ref)
+        let status = RegisterEventHotKey(keyCode, modifiers, hotKeyID, GetApplicationEventTarget(), 0, &ref)
+        if status != noErr {
+            Self.log.error("RegisterEventHotKey failed for id \(self.hotKeyID.id, privacy: .public): OSStatus \(status, privacy: .public)")
+        }
         hotKeyRef = ref
     }
 
