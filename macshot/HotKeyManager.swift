@@ -62,7 +62,16 @@ final class HotKeyManager {
         let selfPtr = Unmanaged.passUnretained(self).toOpaque()
 
         InstallEventHandler(GetApplicationEventTarget(), { _, event, userData in
-            guard let event, let userData else { return noErr }
+            // Returning noErr tells Carbon "fully handled, stop propagating
+            // this event" — with two HotKeyManagers installed on the same
+            // shared target, unconditionally returning noErr here (even for
+            // an ID that isn't this instance's own) meant whichever handler
+            // Carbon happened to call first silently swallowed every hotkey
+            // event, including the other manager's, before it ever got a
+            // chance to check whether the event was actually its own. Must
+            // return eventNotHandledErr to let the next handler in the
+            // chain have a turn.
+            guard let event, let userData else { return OSStatus(eventNotHandledErr) }
 
             var receivedID = EventHotKeyID()
             let status = GetEventParameter(
@@ -74,12 +83,14 @@ final class HotKeyManager {
                 nil,
                 &receivedID
             )
-            guard status == noErr else { return noErr }
+            guard status == noErr else { return OSStatus(eventNotHandledErr) }
 
             let manager = Unmanaged<HotKeyManager>.fromOpaque(userData).takeUnretainedValue()
-            if receivedID.signature == manager.hotKeyID.signature && receivedID.id == manager.hotKeyID.id {
-                manager.onTrigger()
+            guard receivedID.signature == manager.hotKeyID.signature && receivedID.id == manager.hotKeyID.id else {
+                return OSStatus(eventNotHandledErr)
             }
+
+            manager.onTrigger()
             return noErr
         }, 1, &eventType, selfPtr, &eventHandler)
     }
