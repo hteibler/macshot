@@ -1,14 +1,28 @@
 # macshot
 
-A native macOS menu bar app that captures a window or the full screen to a
-PNG on a global hotkey, with a configurable destination folder,
-folder/filename templates, and hotkeys.
+A native macOS menu bar app that captures a window or the full screen on a
+global hotkey, saving it as PNG, JPG, or GIF into a configurable folder
+with configurable folder/filename templates.
 
 ## Status
 
-Core features are implemented: window capture, full-screen capture,
-configurable hotkeys, folder/filename templates with filters, launch at
-login, and optional copy-to-clipboard.
+Core features are implemented:
+
+- Window capture and full-screen capture, each on its own independent
+  global hotkey
+- Output format is selectable — PNG, JPG (with adjustable quality), or GIF
+- Folder/filename templates with placeholder tokens: date/time
+  (`{YYYY}`/`{MM}`/`{DD}`/`{hh}`/`{mm}`/`{ss}`), the captured window's
+  `{title}`/`{app}`, a persisted incrementing counter (`{NUM}`), and
+  random alphanumeric strings of any length (`{RRR...}` — the number of
+  `R`s sets the length)
+- Search/replace filters on the rendered folder name, and nested
+  subfolders by putting `/` directly in the folder name template
+  (e.g. `{YYYY}/{MM}-{DD}`)
+- An in-app Help sheet listing every template token
+- Optional save notifications (banner and/or sound, independently
+  toggleable) and copy-to-clipboard
+- Launch at login
 
 ## Distribution
 
@@ -55,7 +69,15 @@ icon in the menu bar after launch. The first capture attempt triggers a
 Screen Recording permission prompt (System Settings → Privacy & Security
 → Screen Recording); grant it and try the hotkey again. Click the menu bar
 icon → Settings to configure the root folder, folder/filename templates,
-hotkeys, and clipboard/login behavior.
+output format, both hotkeys, and clipboard/notification/login behavior.
+There's also a Help button in Settings listing every template token.
+
+**Notifications require a real code signature.** If you build without a
+Development Team configured in Xcode (Settings → Accounts, then select
+that team for the `macshot` target's signing), the app is signed
+ad-hoc/locally only, and macOS's notification system won't authorize it —
+the "Notify on Save" toggle will silently do nothing. A free Personal Team
+is enough; everything else works fine without one.
 
 ## License
 
