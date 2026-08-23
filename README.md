@@ -8,19 +8,12 @@ folder/filename templates, and hotkeys.
 
 Core features are implemented: window capture, full-screen capture,
 configurable hotkeys, folder/filename templates with filters, launch at
-login, and optional copy-to-clipboard. See:
-
-- [SPEC.md](SPEC.md) — requirements
-- [CONTEXT.md](CONTEXT.md) — current milestone and implementation notes
-- [TODO.md](TODO.md) — task checklist
-- [AGENTS.md](AGENTS.md) — contribution/AI-coding guidelines
+login, and optional copy-to-clipboard.
 
 ## Distribution
 
 macshot is distributed as source via this GitHub repository only — build
-it yourself (see below). There's no DMG/pre-built release. The repository
-is currently **private**; the clone URL below only works for accounts with
-access until/unless that changes.
+it yourself (see below). There's no DMG/pre-built release.
 
 ## Requirements
 
