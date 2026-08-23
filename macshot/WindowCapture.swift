@@ -4,11 +4,10 @@ import ScreenCaptureKit
 enum WindowCaptureError: Error {
     case noFocusedWindow
     case noDisplay
-    case encodingFailed
 }
 
 struct WindowCaptureResult {
-    let png: Data
+    let image: CGImage
     let title: String
     let appName: String
 }
@@ -40,7 +39,7 @@ enum WindowCapture {
         let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
 
         return WindowCaptureResult(
-            png: try encodePNG(image),
+            image: image,
             title: window.title ?? "",
             appName: window.owningApplication?.applicationName ?? ""
         )
@@ -76,13 +75,6 @@ enum WindowCapture {
         }
         let screenNumber = (screenIDs.firstIndex(of: displayID) ?? 0) + 1
 
-        return WindowCaptureResult(png: try encodePNG(image), title: "Screen\(screenNumber)", appName: "")
-    }
-
-    private static func encodePNG(_ image: CGImage) throws -> Data {
-        guard let png = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else {
-            throw WindowCaptureError.encodingFailed
-        }
-        return png
+        return WindowCaptureResult(image: image, title: "Screen\(screenNumber)", appName: "")
     }
 }

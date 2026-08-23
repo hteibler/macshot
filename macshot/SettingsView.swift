@@ -6,6 +6,7 @@ import os.log
 struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
     @State private var launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
+    @State private var showingHelp = false
 
     private let log = Logger(subsystem: "at.teibler.macshot", category: "settings")
 
@@ -49,8 +50,34 @@ struct SettingsView: View {
                         TextField("", text: Binding(
                             get: { settings.filenameTemplate },
                             set: { settings.filenameTemplate = $0 }
-                        ), prompt: Text("{hh}-{mm}-{ss}.png"))
+                        ), prompt: Text("{hh}-{mm}-{ss}"))
                         .textFieldStyle(.roundedBorder)
+                    }
+
+                    SettingsCard(title: "Format") {
+                        Picker("", selection: Binding(
+                            get: { settings.imageFormat },
+                            set: { settings.imageFormat = $0 }
+                        )) {
+                            ForEach(ImageFormat.allCases) { format in
+                                Text(format.displayName).tag(format)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+
+                        if settings.imageFormat == .jpg {
+                            HStack {
+                                Text("Quality")
+                                Slider(value: Binding(
+                                    get: { settings.jpegQuality },
+                                    set: { settings.jpegQuality = $0 }
+                                ), in: 0...1)
+                                Text("\(Int(settings.jpegQuality * 100))%")
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 40, alignment: .trailing)
+                            }
+                        }
                     }
 
                     SettingsCard(title: "Hotkeys") {
@@ -78,6 +105,23 @@ struct SettingsView: View {
                             set: { settings.copyToClipboard = $0 }
                         ))
                     }
+
+                    SettingsCard(title: "Notifications") {
+                        Toggle("Notify on Save", isOn: Binding(
+                            get: { settings.notifyOnSave },
+                            set: { newValue in
+                                settings.notifyOnSave = newValue
+                                if newValue {
+                                    CaptureNotifier.requestAuthorization()
+                                }
+                            }
+                        ))
+                        Toggle("Play Sound", isOn: Binding(
+                            get: { settings.notifySound },
+                            set: { settings.notifySound = $0 }
+                        ))
+                        .disabled(!settings.notifyOnSave)
+                    }
                 }
                 .padding(20)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -85,19 +129,25 @@ struct SettingsView: View {
 
             Divider()
 
-            HStack {
+            HStack(alignment: .top) {
                 Button("Close") { closeWindow() }
                     .keyboardShortcut(.defaultAction)
+                Button("Help") { showingHelp = true }
                 Spacer()
-                Text("Provided for free by Herbert Teibler. Distributed \"as is\" without warranty of any kind.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.trailing)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(AppVersion.displayString)
+                    Text("Provided for free by Herbert Teibler. Distributed \"as is\" without warranty of any kind.")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.trailing)
             }
             .padding(12)
         }
-        .frame(width: 440, height: 560)
+        .frame(width: 440, height: 620)
+        .sheet(isPresented: $showingHelp) {
+            HelpView()
+        }
     }
 
     private func closeWindow() {

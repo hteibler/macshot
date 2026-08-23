@@ -30,6 +30,11 @@ final class AppSettings: ObservableObject {
         static let hotKey = "hotKey"
         static let fullScreenHotKey = "fullScreenHotKey"
         static let copyToClipboard = "copyToClipboard"
+        static let imageFormat = "imageFormat"
+        static let jpegQuality = "jpegQuality"
+        static let sequenceNumber = "sequenceNumber"
+        static let notifyOnSave = "notifyOnSave"
+        static let notifySound = "notifySound"
     }
 
     private static var defaultRootFolder: URL {
@@ -64,8 +69,10 @@ final class AppSettings: ObservableObject {
         set { defaults.set(newValue, forKey: Keys.folderNameTemplate); objectWillChange.send() }
     }
 
+    // No extension here — the image format setting supplies it (see
+    // CaptureController.applyExtension).
     var filenameTemplate: String {
-        get { defaults.string(forKey: Keys.filenameTemplate) ?? "{hh}-{mm}-{ss}.png" }
+        get { defaults.string(forKey: Keys.filenameTemplate) ?? "{hh}-{mm}-{ss}" }
         set { defaults.set(newValue, forKey: Keys.filenameTemplate); objectWillChange.send() }
     }
 
@@ -87,6 +94,36 @@ final class AppSettings: ObservableObject {
     var copyToClipboard: Bool {
         get { defaults.bool(forKey: Keys.copyToClipboard) }
         set { defaults.set(newValue, forKey: Keys.copyToClipboard); objectWillChange.send() }
+    }
+
+    var imageFormat: ImageFormat {
+        get { ImageFormat(rawValue: defaults.string(forKey: Keys.imageFormat) ?? "") ?? .png }
+        set { defaults.set(newValue.rawValue, forKey: Keys.imageFormat); objectWillChange.send() }
+    }
+
+    var jpegQuality: Double {
+        get { defaults.object(forKey: Keys.jpegQuality) != nil ? defaults.double(forKey: Keys.jpegQuality) : 0.9 }
+        set { defaults.set(newValue, forKey: Keys.jpegQuality); objectWillChange.send() }
+    }
+
+    var notifyOnSave: Bool {
+        get { defaults.bool(forKey: Keys.notifyOnSave) }
+        set { defaults.set(newValue, forKey: Keys.notifyOnSave); objectWillChange.send() }
+    }
+
+    var notifySound: Bool {
+        get { defaults.bool(forKey: Keys.notifySound) }
+        set { defaults.set(newValue, forKey: Keys.notifySound); objectWillChange.send() }
+    }
+
+    /// Not settings-UI-bound, so no objectWillChange — this is an internal
+    /// counter consumed once per save, not a field someone edits.
+    /// `integer(forKey:)` returns 0 for a missing key, so the first capture
+    /// naturally yields 1.
+    func nextSequenceNumber() -> Int {
+        let next = defaults.integer(forKey: Keys.sequenceNumber) + 1
+        defaults.set(next, forKey: Keys.sequenceNumber)
+        return next
     }
 
     private func save<T: Encodable>(_ value: T, key: String) {
