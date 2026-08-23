@@ -89,6 +89,11 @@ struct SettingsView: View {
                 Button("Close") { closeWindow() }
                     .keyboardShortcut(.defaultAction)
                 Spacer()
+                Text("Provided for free by Herbert Teibler. Distributed \"as is\" without warranty of any kind.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.trailing)
             }
             .padding(12)
         }
