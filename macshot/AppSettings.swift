@@ -70,10 +70,17 @@ final class AppSettings: ObservableObject {
     }
 
     // No extension here — the image format setting supplies it (see
-    // CaptureController.applyExtension).
+    // CaptureController.applyExtension). Stripped on both read and write so
+    // a value persisted before this became automatic (e.g. an old
+    // "...{ss}.png") doesn't keep showing a now-misleading extension.
     var filenameTemplate: String {
-        get { defaults.string(forKey: Keys.filenameTemplate) ?? "{hh}-{mm}-{ss}" }
-        set { defaults.set(newValue, forKey: Keys.filenameTemplate); objectWillChange.send() }
+        get { Self.strippingExtension(defaults.string(forKey: Keys.filenameTemplate) ?? "{hh}-{mm}-{ss}") }
+        set { defaults.set(Self.strippingExtension(newValue), forKey: Keys.filenameTemplate); objectWillChange.send() }
+    }
+
+    private static func strippingExtension(_ value: String) -> String {
+        let stem = (value as NSString).deletingPathExtension
+        return stem.isEmpty ? value : stem
     }
 
     var folderNameFilters: [FilterRule] {
