@@ -30,6 +30,12 @@ final class CaptureController {
         fullScreenHotKeyManager = fullScreenManager
         applyFullScreenHotKey(settings.fullScreenHotKey)
 
+        // Re-request every launch, not just when the Settings toggle flips
+        // on — see CaptureNotifier.requestAuthorization for why.
+        if settings.notifyOnSave {
+            CaptureNotifier.requestAuthorization()
+        }
+
         // objectWillChange fires for every settings edit, not just the hotkeys,
         // since AppSettings uses computed properties over UserDefaults rather
         // than per-field publishers — cheap enough to just re-check each time.
