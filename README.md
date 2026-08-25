@@ -113,6 +113,10 @@ ad-hoc/locally only, and macOS's notification system won't authorize it —
 the "Notify on Save" toggle will silently do nothing. A free Personal Team
 is enough to fix it; everything else works fine without one.
 
+If notifications still aren't showing up (e.g. the system permission prompt
+was missed or dismissed on first launch), go to System Settings →
+Notifications → macshot and activate it there.
+
 ## License
 
 MIT — see [LICENSE.md](LICENSE.md).
