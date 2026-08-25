@@ -120,9 +120,6 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					9D43D6266281FC7D47F2C367 = {
-						ProvisioningStyle = Automatic;
-					};
 				};
 			};
 			buildConfigurationList = 6F37EB62E49661A5AFC83A1D /* Build configuration list for PBXProject "macshot" */;
@@ -249,9 +246,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V8583J8736;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = macshot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

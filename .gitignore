@@ -18,6 +18,9 @@ xcuserdata/
 # macOS
 .DS_Store
 
+# Claude Code harness artifacts
+.claude/
+
 # Internal planning/AI-collaboration docs — kept locally, not published
 # on the (public) GitHub repo. See SPEC.md's phase2 "cleanup github" note.
 AGENTS.md
