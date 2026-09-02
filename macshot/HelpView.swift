@@ -52,7 +52,10 @@ struct HelpView: View {
                 }
             }
 
-            HStack {
+            HStack(alignment: .center) {
+                Text(AppVersion.displayString)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Button("Close") { dismiss() }
                     .keyboardShortcut(.defaultAction)

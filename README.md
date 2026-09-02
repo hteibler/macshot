@@ -4,6 +4,8 @@ A native macOS menu bar app that captures a window or the full screen on a
 global hotkey, saving it as PNG, JPG, or GIF into a configurable folder
 with configurable folder/filename templates.
 
+**Current version:** 2.0 (2026-09-02)
+
 ## Status
 
 Core features are implemented:
