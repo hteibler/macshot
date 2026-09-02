@@ -5,6 +5,10 @@ import os.log
 enum CaptureNotifier {
     private static let log = Logger(subsystem: "at.teibler.macshot", category: "notifications")
 
+    /// Read back by CaptureNotificationDelegate when the user clicks the
+    /// banner, so it knows which file to open.
+    static let savedURLUserInfoKey = "at.teibler.macshot.savedURL"
+
     // Safe to call every time: the system caches the user's decision and
     // just returns it without re-prompting once granted or denied for the
     // app's *current* signing identity. Ad-hoc/local-only signing (no
@@ -27,6 +31,7 @@ enum CaptureNotifier {
         let content = UNMutableNotificationContent()
         content.title = "Capture Saved"
         content.body = url.lastPathComponent
+        content.userInfo = [savedURLUserInfoKey: url.path]
         if sound {
             content.sound = .default
         }

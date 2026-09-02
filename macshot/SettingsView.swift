@@ -121,6 +121,27 @@ struct SettingsView: View {
                             set: { settings.notifySound = $0 }
                         ))
                         .disabled(!settings.notifyOnSave)
+
+                        Toggle("Open Screenshot on Click", isOn: Binding(
+                            get: { settings.openScreenshotOnClick },
+                            set: { settings.openScreenshotOnClick = $0 }
+                        ))
+                        .disabled(!settings.notifyOnSave)
+
+                        if settings.openScreenshotOnClick {
+                            HStack(spacing: 10) {
+                                Text(openAppDisplayName)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                                Spacer(minLength: 8)
+                                Button("Choose…") { chooseOpenApp() }
+                                if settings.openScreenshotAppPath != nil {
+                                    Button("Use Default") { settings.openScreenshotAppPath = nil }
+                                }
+                            }
+                            .disabled(!settings.notifyOnSave)
+                        }
                     }
                 }
                 .padding(20)
@@ -164,6 +185,24 @@ struct SettingsView: View {
         } catch {
             log.error("Failed to \(enabled ? "register" : "unregister", privacy: .public) launch-at-login: \(String(describing: error), privacy: .public)")
             launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
+        }
+    }
+
+    private var openAppDisplayName: String {
+        guard let path = settings.openScreenshotAppPath else { return "Default App" }
+        return FileManager.default.displayName(atPath: path)
+    }
+
+    private func chooseOpenApp() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.application]
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        panel.allowsMultipleSelection = false
+        panel.directoryURL = URL(fileURLWithPath: "/Applications")
+
+        if panel.runModal() == .OK, let url = panel.url {
+            settings.openScreenshotAppPath = url.path
         }
     }
 

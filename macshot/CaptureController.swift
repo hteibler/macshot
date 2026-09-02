@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import Foundation
+import UserNotifications
 import os.log
 
 /// Wires the configured hotkeys (window + full-screen) to permission-checked
@@ -18,6 +19,8 @@ final class CaptureController {
     private var cancellable: AnyCancellable?
 
     init() {
+        UNUserNotificationCenter.current().delegate = CaptureNotificationDelegate.shared
+
         let windowManager = HotKeyManager(id: 1) { [weak self] in
             Task { await self?.handleHotKey(capture: WindowCapture.captureFocusedWindow) }
         }
@@ -69,6 +72,7 @@ final class CaptureController {
             let result = try await capture()
             let url = try save(result)
             log.notice("Saved capture to \(url.path, privacy: .public)")
+            CaptureHistory.shared.recordSave(url)
 
             if settings.copyToClipboard {
                 copyToClipboard(result.image)
@@ -89,13 +93,21 @@ final class CaptureController {
             sequenceNumber: settings.nextSequenceNumber()
         )
 
+        // {hashN} is always derived from the folder name (per SPEC.md),
+        // whether it's used in the folder name template, the filename
+        // template, or both — so it's computed once here from the folder
+        // name with any {hashN} occurrence excluded, then spliced into
+        // both renders below.
         var folderName = TemplateRenderer.render(settings.folderNameTemplate, context: context)
+        let hashSource = TemplateRenderer.strippingHashTokens(folderName)
+        folderName = TemplateRenderer.applyHashTokens(to: folderName, hashSource: hashSource)
         for filter in settings.folderNameFilters {
             folderName = folderName.replacingOccurrences(of: filter.search, with: filter.replace)
         }
 
         let format = settings.imageFormat
-        let renderedFileName = TemplateRenderer.render(settings.filenameTemplate, context: context)
+        var renderedFileName = TemplateRenderer.render(settings.filenameTemplate, context: context)
+        renderedFileName = TemplateRenderer.applyHashTokens(to: renderedFileName, hashSource: hashSource)
         let fileName = Self.applyExtension(to: renderedFileName, format: format)
 
         let dir = settings.rootFolder.appendingPathComponent(folderName)

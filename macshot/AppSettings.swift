@@ -35,6 +35,8 @@ final class AppSettings: ObservableObject {
         static let sequenceNumber = "sequenceNumber"
         static let notifyOnSave = "notifyOnSave"
         static let notifySound = "notifySound"
+        static let openScreenshotOnClick = "openScreenshotOnClick"
+        static let openScreenshotAppPath = "openScreenshotAppPath"
     }
 
     private static var defaultRootFolder: URL {
@@ -121,6 +123,26 @@ final class AppSettings: ObservableObject {
     var notifySound: Bool {
         get { defaults.bool(forKey: Keys.notifySound) }
         set { defaults.set(newValue, forKey: Keys.notifySound); objectWillChange.send() }
+    }
+
+    var openScreenshotOnClick: Bool {
+        get { defaults.bool(forKey: Keys.openScreenshotOnClick) }
+        set { defaults.set(newValue, forKey: Keys.openScreenshotOnClick); objectWillChange.send() }
+    }
+
+    // nil means "system default app for the file type". Stored as a plain
+    // path (not bookmark data) — same tradeoff as rootFolder: simple, and
+    // fine for an app the user just picked from /Applications.
+    var openScreenshotAppPath: String? {
+        get { defaults.string(forKey: Keys.openScreenshotAppPath) }
+        set {
+            if let newValue {
+                defaults.set(newValue, forKey: Keys.openScreenshotAppPath)
+            } else {
+                defaults.removeObject(forKey: Keys.openScreenshotAppPath)
+            }
+            objectWillChange.send()
+        }
     }
 
     /// Not settings-UI-bound, so no objectWillChange — this is an internal

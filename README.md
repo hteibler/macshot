@@ -13,15 +13,19 @@ Core features are implemented:
 - Output format is selectable — PNG, JPG (with adjustable quality), or GIF
 - Folder/filename templates with placeholder tokens: date/time
   (`{YYYY}`/`{MM}`/`{DD}`/`{hh}`/`{mm}`/`{ss}`), the captured window's
-  `{title}`/`{app}`, a persisted incrementing counter (`{NUM}`), and
-  random alphanumeric strings of any length (`{RRR...}` — the number of
-  `R`s sets the length)
+  `{title}`/`{app}`, a persisted incrementing counter (`{NUM}`), random
+  alphanumeric strings of any length (`{RRR...}` — the number of `R`s sets
+  the length), and a unique per-folder hash (`{hashN}` — e.g. `{hash5}` for
+  5 characters, a Base62-encoded MD5 hash of the destination folder name)
 - Search/replace filters on the rendered folder name, and nested
   subfolders by putting `/` directly in the folder name template
   (e.g. `{YYYY}/{MM}-{DD}`)
 - An in-app Help sheet listing every template token
 - Optional save notifications (banner and/or sound, independently
-  toggleable) and copy-to-clipboard
+  toggleable), with an optional click-to-open of the just-saved screenshot
+  (in a configurable app), and copy-to-clipboard
+- Menu bar shortcuts to open the last saved screenshot or the root folder
+  in Finder
 - Launch at login
 
 ## Distribution

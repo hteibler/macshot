@@ -7,7 +7,7 @@ enum AppVersion {
 
     // Manually updated alongside each MARKETING_VERSION bump in project.yml —
     // there's no CI here to auto-stamp a real build date.
-    static let buildDate = "2026-08-23"
+    static let buildDate = "2026-08-25"
 
     static var displayString: String {
         "Version \(marketingVersion) (\(buildDate))"
