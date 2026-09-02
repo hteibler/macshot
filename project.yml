@@ -29,3 +29,9 @@ targets:
       properties:
         CFBundleDisplayName: macshot
         LSUIElement: true
+        # Without these, xcodegen's own generated-plist default hardcodes
+        # literal "1.0"/"1" here, silently overriding MARKETING_VERSION /
+        # CURRENT_PROJECT_VERSION above on every `xcodegen generate` — this
+        # is why past version bumps never actually showed up in a build.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
