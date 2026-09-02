@@ -6,6 +6,12 @@ struct MenuBarMenu: View {
     @ObservedObject private var history = CaptureHistory.shared
 
     var body: some View {
+        Button("Open Last Screenshot") {
+            guard let url = history.lastSavedURL else { return }
+            ScreenshotOpener.open(url)
+        }
+        .disabled(history.lastSavedURL == nil)
+
         Button("Open Last in Finder") {
             guard let url = history.lastSavedURL else { return }
             NSWorkspace.shared.activateFileViewerSelecting([url])

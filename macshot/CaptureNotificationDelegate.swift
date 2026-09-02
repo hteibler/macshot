@@ -1,14 +1,11 @@
 import AppKit
 import UserNotifications
-import os.log
 
 /// Handles interaction with save notifications: shows banners even while
 /// macshot is the foreground app, and opens the just-saved screenshot when
 /// the user clicks one (if enabled in Settings).
 final class CaptureNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
     static let shared = CaptureNotificationDelegate()
-
-    private let log = Logger(subsystem: "at.teibler.macshot", category: "notifications")
 
     private override init() {
         super.init()
@@ -37,24 +34,6 @@ final class CaptureNotificationDelegate: NSObject, UNUserNotificationCenterDeleg
         guard AppSettings.shared.openScreenshotOnClick else { return }
         guard let path = response.notification.request.content.userInfo[CaptureNotifier.savedURLUserInfoKey] as? String else { return }
 
-        openScreenshot(at: URL(fileURLWithPath: path))
-    }
-
-    private func openScreenshot(at url: URL) {
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            log.notice("Screenshot no longer exists at \(url.path, privacy: .public); not opening")
-            return
-        }
-
-        if let appPath = AppSettings.shared.openScreenshotAppPath {
-            let appURL = URL(fileURLWithPath: appPath)
-            NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: NSWorkspace.OpenConfiguration()) { [log] _, error in
-                if let error {
-                    log.error("Failed to open screenshot with configured app: \(String(describing: error), privacy: .public)")
-                }
-            }
-        } else {
-            NSWorkspace.shared.open(url)
-        }
+        ScreenshotOpener.open(URL(fileURLWithPath: path))
     }
 }

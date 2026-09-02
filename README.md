@@ -24,8 +24,8 @@ Core features are implemented:
 - Optional save notifications (banner and/or sound, independently
   toggleable), with an optional click-to-open of the just-saved screenshot
   (in a configurable app), and copy-to-clipboard
-- Menu bar shortcuts to open the last saved screenshot or the root folder
-  in Finder
+- Menu bar shortcuts to open the last screenshot (in a configurable app),
+  reveal it in Finder, or open the root folder
 - Launch at login
 
 ## Distribution

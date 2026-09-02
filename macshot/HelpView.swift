@@ -47,7 +47,7 @@ struct HelpView: View {
 
                     Text("Menu bar & notifications")
                         .font(.headline)
-                    Text("The menu bar dropdown has \"Open Last in Finder\" and \"Open Root Folder\" shortcuts. Clicking a save notification opens that screenshot — enable \"Open Screenshot on Click\" in Settings → Notifications, and optionally pick which app to use.")
+                    Text("The menu bar dropdown has \"Open Last Screenshot\", \"Open Last in Finder\", and \"Open Root Folder\" shortcuts. Clicking a save notification also opens that screenshot — enable \"Open Screenshot on Click\" in Settings → Notifications. Both use the same configurable app (or the system default).")
                         .foregroundStyle(.secondary)
                 }
             }
