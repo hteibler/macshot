@@ -77,4 +77,46 @@ enum WindowCapture {
 
         return WindowCaptureResult(image: image, title: "Screen\(screenNumber)", appName: "")
     }
+
+    /// Captures `rect` (in `screen`'s local point space, top-left origin —
+    /// matching RegionSelectionOverlay's flipped selection view) out of a
+    /// full capture of that display, scaled to pixels and cropped.
+    static func captureRegion(rect: CGRect, screen: NSScreen) async throws -> WindowCaptureResult {
+        guard let displayID = (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value else {
+            throw WindowCaptureError.noDisplay
+        }
+
+        let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+        guard let display = content.displays.first(where: { $0.displayID == displayID }) else {
+            throw WindowCaptureError.noDisplay
+        }
+
+        let filter = SCContentFilter(display: display, excludingWindows: [])
+        let config = SCStreamConfiguration()
+        let scale = screen.backingScaleFactor
+        config.width = Int(CGFloat(display.width) * scale)
+        config.height = Int(CGFloat(display.height) * scale)
+        config.showsCursor = false
+
+        let fullImage = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
+
+        let imageBounds = CGRect(x: 0, y: 0, width: fullImage.width, height: fullImage.height)
+        let pixelRect = CGRect(
+            x: rect.origin.x * scale,
+            y: rect.origin.y * scale,
+            width: rect.width * scale,
+            height: rect.height * scale
+        ).integral.intersection(imageBounds)
+
+        guard !pixelRect.isEmpty, let cropped = fullImage.cropping(to: pixelRect) else {
+            throw WindowCaptureError.noDisplay
+        }
+
+        let screenIDs = NSScreen.screens.compactMap {
+            ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+        }
+        let screenNumber = (screenIDs.firstIndex(of: displayID) ?? 0) + 1
+
+        return WindowCaptureResult(image: cropped, title: "Screen\(screenNumber) Selection", appName: "")
+    }
 }

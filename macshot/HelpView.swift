@@ -10,8 +10,8 @@ struct HelpView: View {
         ("{hh}", "2-digit hour (24h)"),
         ("{mm}", "2-digit minute"),
         ("{ss}", "2-digit second"),
-        ("{title}", "Captured window's title. For full-screen captures there's no window, so this is \"Screen1\", \"Screen2\", etc. instead."),
-        ("{app}", "Captured window's owning app name. Empty for full-screen captures."),
+        ("{title}", "Captured window's title. Full-screen captures have no window, so this is \"Screen1\", \"Screen2\", etc. instead; region captures use \"Screen1 Selection\", etc."),
+        ("{app}", "Captured window's owning app name. Empty for full-screen and region captures."),
         ("{NUM}", "Incrementing counter, 6 digits, shared across both hotkeys."),
         ("{RRR...}", "Random alphanumeric characters — the number of R's sets the length, e.g. {RRR} = 3 random characters."),
         ("{hashN}", "Unique hash derived from the destination folder name, truncated to N characters, e.g. {hash5} = 5 characters. Same value for every file saved into that folder — usable in the folder name and/or the filename."),
@@ -40,6 +40,14 @@ struct HelpView: View {
                     Text("Nested folders")
                         .font(.headline)
                     Text("Use \"/\" in the Folder Name template to create nested subfolders, e.g. \"{YYYY}/{MM}-{DD}\" creates a year folder containing a month-day folder inside it.")
+                        .foregroundStyle(.secondary)
+
+                    Divider()
+                        .padding(.vertical, 4)
+
+                    Text("Capture modes")
+                        .font(.headline)
+                    Text("Three independent hotkeys, each configurable in Settings → Hotkeys: Window (the focused window), Full Screen, and Region — drag out a rectangle on the dimmed overlay, release to capture just that area, or press Esc to cancel.")
                         .foregroundStyle(.secondary)
 
                     Divider()

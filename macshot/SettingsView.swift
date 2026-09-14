@@ -97,6 +97,14 @@ struct SettingsView: View {
                                 set: { settings.fullScreenHotKey = $0 }
                             ))
                         }
+                        HStack {
+                            Text("Region")
+                            Spacer()
+                            HotKeyRecorderView(hotKey: Binding(
+                                get: { settings.regionHotKey },
+                                set: { settings.regionHotKey = $0 }
+                            ))
+                        }
                     }
 
                     SettingsCard(title: "Behavior") {

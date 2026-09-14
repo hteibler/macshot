@@ -29,6 +29,7 @@ final class AppSettings: ObservableObject {
         static let filenameTemplate = "filenameTemplate"
         static let hotKey = "hotKey"
         static let fullScreenHotKey = "fullScreenHotKey"
+        static let regionHotKey = "regionHotKey"
         static let copyToClipboard = "copyToClipboard"
         static let imageFormat = "imageFormat"
         static let jpegQuality = "jpegQuality"
@@ -53,6 +54,12 @@ final class AppSettings: ObservableObject {
         keyCode: UInt32(kVK_ANSI_8),
         modifiers: UInt32(cmdKey | shiftKey),
         displayKey: "8"
+    )
+
+    private static let defaultRegionHotKey = HotKeyCombo(
+        keyCode: UInt32(kVK_ANSI_7),
+        modifiers: UInt32(cmdKey | shiftKey),
+        displayKey: "7"
     )
 
     // Persist before sending objectWillChange: subscribers (including our own
@@ -98,6 +105,11 @@ final class AppSettings: ObservableObject {
     var fullScreenHotKey: HotKeyCombo {
         get { load(HotKeyCombo.self, key: Keys.fullScreenHotKey) ?? Self.defaultFullScreenHotKey }
         set { save(newValue, key: Keys.fullScreenHotKey); objectWillChange.send() }
+    }
+
+    var regionHotKey: HotKeyCombo {
+        get { load(HotKeyCombo.self, key: Keys.regionHotKey) ?? Self.defaultRegionHotKey }
+        set { save(newValue, key: Keys.regionHotKey); objectWillChange.send() }
     }
 
     var copyToClipboard: Bool {

@@ -1,17 +1,18 @@
 # macshot
 
-A native macOS menu bar app that captures a window or the full screen on a
-global hotkey, saving it as PNG, JPG, or GIF into a configurable folder
-with configurable folder/filename templates.
+A native macOS menu bar app that captures a window, the full screen, or a
+dragged rectangle on a global hotkey, saving it as PNG, JPG, or GIF into a
+configurable folder with configurable folder/filename templates.
 
-**Current version:** 2.0 (2026-09-02)
+**Current version:** 2.1 (2026-09-14)
 
 ## Status
 
 Core features are implemented:
 
-- Window capture and full-screen capture, each on its own independent
-  global hotkey
+- Window capture, full-screen capture, and region capture (drag a
+  rectangle on a dimmed overlay, like macOS's built-in Cmd+Shift+4), each
+  on its own independent global hotkey
 - Output format is selectable — PNG, JPG (with adjustable quality), or GIF
 - Folder/filename templates with placeholder tokens: date/time
   (`{YYYY}`/`{MM}`/`{DD}`/`{hh}`/`{mm}`/`{ss}`), the captured window's
@@ -108,7 +109,7 @@ icon in the menu bar after launch. The first capture attempt triggers a
 Screen Recording permission prompt (System Settings → Privacy & Security
 → Screen Recording); grant it and try the hotkey again. Click the menu bar
 icon → Settings to configure the root folder, folder/filename templates,
-output format, both hotkeys, and clipboard/notification/login behavior.
+output format, all three hotkeys, and clipboard/notification/login behavior.
 There's also a Help button in Settings listing every template token.
 
 **Notifications require a real code signature.** The released DMG is

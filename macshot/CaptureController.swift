@@ -14,8 +14,10 @@ final class CaptureController {
 
     private var windowHotKeyManager: HotKeyManager?
     private var fullScreenHotKeyManager: HotKeyManager?
+    private var regionHotKeyManager: HotKeyManager?
     private var registeredWindowHotKey: HotKeyCombo?
     private var registeredFullScreenHotKey: HotKeyCombo?
+    private var registeredRegionHotKey: HotKeyCombo?
     private var cancellable: AnyCancellable?
 
     init() {
@@ -33,6 +35,12 @@ final class CaptureController {
         fullScreenHotKeyManager = fullScreenManager
         applyFullScreenHotKey(settings.fullScreenHotKey)
 
+        let regionManager = HotKeyManager(id: 3) { [weak self] in
+            Task { await self?.handleRegionHotKey() }
+        }
+        regionHotKeyManager = regionManager
+        applyRegionHotKey(settings.regionHotKey)
+
         // Re-request every launch, not just when the Settings toggle flips
         // on — see CaptureNotifier.requestAuthorization for why.
         if settings.notifyOnSave {
@@ -46,6 +54,7 @@ final class CaptureController {
             guard let self else { return }
             self.applyWindowHotKey(self.settings.hotKey)
             self.applyFullScreenHotKey(self.settings.fullScreenHotKey)
+            self.applyRegionHotKey(self.settings.regionHotKey)
         }
     }
 
@@ -59,6 +68,12 @@ final class CaptureController {
         guard hotKey != registeredFullScreenHotKey else { return }
         registeredFullScreenHotKey = hotKey
         fullScreenHotKeyManager?.update(keyCode: hotKey.keyCode, modifiers: hotKey.modifiers)
+    }
+
+    private func applyRegionHotKey(_ hotKey: HotKeyCombo) {
+        guard hotKey != registeredRegionHotKey else { return }
+        registeredRegionHotKey = hotKey
+        regionHotKeyManager?.update(keyCode: hotKey.keyCode, modifiers: hotKey.modifiers)
     }
 
     private func handleHotKey(capture: @escaping () async throws -> WindowCaptureResult) async {
@@ -82,6 +97,32 @@ final class CaptureController {
             }
         } catch {
             log.error("Capture failed: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    // Checks permission and shows the drag-selection overlay up front —
+    // separate from handleHotKey's own permission check — so the user
+    // never draws a selection only to be told afterward they can't capture.
+    // Once a rect is chosen, the rest (permission re-check included) reuses
+    // handleHotKey exactly like the other two capture modes.
+    private func handleRegionHotKey() async {
+        guard ScreenRecordingPermission.isGranted else {
+            log.notice("Screen Recording permission not granted; requesting")
+            ScreenRecordingPermission.request()
+            return
+        }
+
+        // Fresh instance per invocation — RegionSelectionOverlay's init is
+        // @MainActor-isolated, so this hops there implicitly; no need to
+        // keep one around between hotkey presses.
+        let overlay = await RegionSelectionOverlay()
+        guard let selection = await overlay.presentOnScreenUnderCursor() else {
+            log.notice("Region selection cancelled")
+            return
+        }
+
+        await handleHotKey {
+            try await WindowCapture.captureRegion(rect: selection.rect, screen: selection.screen)
         }
     }
 
