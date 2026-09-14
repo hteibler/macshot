@@ -39,13 +39,19 @@ final class RegionSelectionOverlay {
         view.onFinish = { [weak self] rect in self?.finish(rect: rect, screen: screen) }
         view.onCancel = { [weak self] in self?.finish(rect: nil, screen: screen) }
 
+        // Passing `screen:` here alongside an already-global contentRect
+        // made AppKit add that screen's origin a second time for a
+        // negative-origin (non-primary) screen — e.g. a screen at x=-2560
+        // landed the window at x=-5120, off in space with no monitor there.
+        // Omitting `screen:` and setting the frame explicitly afterward
+        // avoids that double offset.
         let window = OverlayWindow(
-            contentRect: screen.frame,
+            contentRect: .zero,
             styleMask: .borderless,
             backing: .buffered,
-            defer: false,
-            screen: screen
+            defer: false
         )
+        window.setFrame(screen.frame, display: false)
         window.isOpaque = false
         window.backgroundColor = .clear
         window.hasShadow = false
