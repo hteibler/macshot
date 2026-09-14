@@ -1,4 +1,5 @@
 import AppKit
+import os.log
 
 struct RegionSelectionResult {
     let rect: CGRect
@@ -11,6 +12,8 @@ struct RegionSelectionResult {
 /// callers `await` it from wherever a hotkey handler happens to run.
 @MainActor
 final class RegionSelectionOverlay {
+    private static let log = Logger(subsystem: "at.teibler.macshot", category: "region-selection")
+
     private var window: NSWindow?
     private var continuation: CheckedContinuation<RegionSelectionResult?, Never>?
 
@@ -20,8 +23,10 @@ final class RegionSelectionOverlay {
     func presentOnScreenUnderCursor() async -> RegionSelectionResult? {
         let cursorLocation = NSEvent.mouseLocation
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(cursorLocation) }) ?? NSScreen.main else {
+            Self.log.error("No screen contains cursor location \(String(describing: cursorLocation), privacy: .public)")
             return nil
         }
+        Self.log.notice("Presenting region overlay: cursor=\(String(describing: cursorLocation), privacy: .public) screenFrame=\(String(describing: screen.frame), privacy: .public)")
 
         return await withCheckedContinuation { continuation in
             self.continuation = continuation
@@ -46,13 +51,24 @@ final class RegionSelectionOverlay {
         window.hasShadow = false
         window.level = .screenSaver
         window.ignoresMouseEvents = false
-        window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
+        // Deliberately minimal: this window is created and torn down for a
+        // single selection, so it doesn't need to persist across Space
+        // switches. .canJoinAllSpaces/.stationary (tried first) are meant
+        // for long-lived utility windows and, with "Displays have separate
+        // Spaces" turned off in System Settings, seemed to be why the
+        // overlay wasn't reliably appearing on a secondary display —
+        // .fullScreenAuxiliary alone (just "allowed over a full-screen app")
+        // is all this actually needs.
+        window.collectionBehavior = [.fullScreenAuxiliary]
         window.contentView = view
 
         self.window = window
         window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
         window.makeFirstResponder(view)
+
+        Self.log.notice("Overlay window presented: key=\(window.isKeyWindow, privacy: .public) visible=\(window.isVisible, privacy: .public) frame=\(String(describing: window.frame), privacy: .public)")
     }
 
     private func finish(rect: CGRect?, screen: NSScreen) {
