@@ -10,10 +10,20 @@ struct WindowCaptureResult {
     let image: CGImage
     let title: String
     let appName: String
+    /// The active tab's URL, when `contentOnly` was requested and the
+    /// window belongs to a browser. nil otherwise.
+    let browserURL: String?
+
+    init(image: CGImage, title: String, appName: String, browserURL: String? = nil) {
+        self.image = image
+        self.title = title
+        self.appName = appName
+        self.browserURL = browserURL
+    }
 }
 
 enum WindowCapture {
-    static func captureFocusedWindow() async throws -> WindowCaptureResult {
+    static func captureFocusedWindow(contentOnly: Bool) async throws -> WindowCaptureResult {
         guard let frontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier else {
             throw WindowCaptureError.noFocusedWindow
         }
@@ -28,7 +38,14 @@ enum WindowCapture {
 
         let filter = SCContentFilter(desktopIndependentWindow: window)
         let config = SCStreamConfiguration()
-        let center = CGPoint(x: window.frame.midX, y: window.frame.midY)
+        // window.frame is in ScreenCaptureKit's global space (origin top-left
+        // of the primary display, y down). NSScreen.frame is in AppKit's
+        // space (origin bottom-left of the primary display, y up) — flip y
+        // through the primary screen's height before matching, or this
+        // silently fails (and falls back to the wrong display's scale) for
+        // any window on a secondary display with a negative Cocoa origin.
+        let primaryScreenHeight = NSScreen.screens.first?.frame.height ?? 0
+        let center = CGPoint(x: window.frame.midX, y: primaryScreenHeight - window.frame.midY)
         let scale = NSScreen.screens.first(where: { $0.frame.contains(center) })?.backingScaleFactor
             ?? NSScreen.main?.backingScaleFactor
             ?? 2
@@ -38,10 +55,27 @@ enum WindowCapture {
 
         let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
 
+        var resultImage = image
+        if contentOnly, let contentFrame = await BrowserContentLocator.contentFrame(forPID: frontmostPID) {
+            let pixelRect = CGRect(
+                x: (contentFrame.origin.x - window.frame.origin.x) * scale,
+                y: (contentFrame.origin.y - window.frame.origin.y) * scale,
+                width: contentFrame.width * scale,
+                height: contentFrame.height * scale
+            ).integral.intersection(CGRect(x: 0, y: 0, width: image.width, height: image.height))
+
+            if !pixelRect.isEmpty, let cropped = image.cropping(to: pixelRect) {
+                resultImage = cropped
+            }
+        }
+
+        let browserURL = contentOnly ? BrowserContentLocator.documentURL(forPID: frontmostPID) : nil
+
         return WindowCaptureResult(
-            image: image,
+            image: resultImage,
             title: window.title ?? "",
-            appName: window.owningApplication?.applicationName ?? ""
+            appName: window.owningApplication?.applicationName ?? "",
+            browserURL: browserURL
         )
     }
 

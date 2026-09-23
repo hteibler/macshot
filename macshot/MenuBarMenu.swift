@@ -4,6 +4,7 @@ import SwiftUI
 struct MenuBarMenu: View {
     @Environment(\.openSettings) private var openSettings
     @ObservedObject private var history = CaptureHistory.shared
+    @ObservedObject private var settings = AppSettings.shared
 
     var body: some View {
         Button("Open Last Screenshot") {
@@ -21,6 +22,11 @@ struct MenuBarMenu: View {
         Button("Open Root Folder") {
             openRootFolder()
         }
+
+        Toggle("Browser Content Only", isOn: Binding(
+            get: { settings.browserContentOnly },
+            set: { settings.browserContentOnly = $0 }
+        ))
 
         Divider()
 

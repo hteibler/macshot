@@ -31,6 +31,7 @@ final class AppSettings: ObservableObject {
         static let fullScreenHotKey = "fullScreenHotKey"
         static let regionHotKey = "regionHotKey"
         static let copyToClipboard = "copyToClipboard"
+        static let browserContentOnly = "browserContentOnly"
         static let imageFormat = "imageFormat"
         static let jpegQuality = "jpegQuality"
         static let sequenceNumber = "sequenceNumber"
@@ -115,6 +116,13 @@ final class AppSettings: ObservableObject {
     var copyToClipboard: Bool {
         get { defaults.bool(forKey: Keys.copyToClipboard) }
         set { defaults.set(newValue, forKey: Keys.copyToClipboard); objectWillChange.send() }
+    }
+
+    // Only takes effect in window-capture mode (SPEC.md Version 2.2) — full
+    // screen and region captures have no browser chrome to strip.
+    var browserContentOnly: Bool {
+        get { defaults.bool(forKey: Keys.browserContentOnly) }
+        set { defaults.set(newValue, forKey: Keys.browserContentOnly); objectWillChange.send() }
     }
 
     var imageFormat: ImageFormat {

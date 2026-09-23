@@ -112,6 +112,14 @@ struct SettingsView: View {
                             get: { settings.copyToClipboard },
                             set: { settings.copyToClipboard = $0 }
                         ))
+
+                        Toggle("Browser Content Only", isOn: Binding(
+                            get: { settings.browserContentOnly },
+                            set: { settings.browserContentOnly = $0 }
+                        ))
+                        Text("Window captures of a browser include only the web page content — no tab bar, bookmarks bar, URL bar, or window border. No effect on Full Screen or Region captures. Requires granting Accessibility permission when first used.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
 
                     SettingsCard(title: "Notifications") {

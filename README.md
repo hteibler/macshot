@@ -4,7 +4,7 @@ A native macOS menu bar app that captures a window, the full screen, or a
 dragged rectangle on a global hotkey, saving it as PNG, JPG, or GIF into a
 configurable folder with configurable folder/filename templates.
 
-**Current version:** 2.1 (2026-09-14)
+**Current version:** 2.2 (2026-09-23)
 
 ## Status
 
@@ -27,8 +27,12 @@ Core features are implemented:
 - Optional save notifications (banner and/or sound, independently
   toggleable), with an optional click-to-open of the just-saved screenshot
   (in a configurable app), and copy-to-clipboard
+- "Browser Content Only" (Settings → Behavior, also toggleable from the
+  menu bar dropdown): window captures of a browser include only the web
+  page content, cropping out the tab bar, bookmarks bar, URL bar, and
+  window border
 - Menu bar shortcuts to open the last screenshot (in a configurable app),
-  reveal it in Finder, or open the root folder
+  reveal it in Finder, open the root folder, or toggle Browser Content Only
 - Launch at login
 
 ## Distribution
@@ -111,6 +115,24 @@ Screen Recording permission prompt (System Settings → Privacy & Security
 icon → Settings to configure the root folder, folder/filename templates,
 output format, all three hotkeys, and clipboard/notification/login behavior.
 There's also a Help button in Settings listing every template token.
+
+Enabling "Browser Content Only" (Settings → Behavior) triggers a separate
+Accessibility permission prompt (System Settings → Privacy & Security →
+Accessibility) on first use; until granted, or for windows that aren't a
+browser, the full window is captured instead. Chromium-based browsers
+(Chrome, Edge, Brave, …) only build their web-content accessibility tree
+on demand — the first capture of a Chromium browser window after
+enabling this toggle may still return the full window while that tree
+builds in the background (up to ~1s); every capture after that is cropped
+correctly for the rest of that browser session. Safari/WebKit doesn't
+have this delay.
+
+**Self-built (unsigned/ad-hoc) apps lose Screen Recording and
+Accessibility grants on every rebuild.** Xcode's local "Sign to Run
+Locally" identity changes with each build, so macOS treats each rebuild
+as a new, unrecognized app for these two permissions — re-grant both
+(and relaunch) after every `xcodebuild`/Xcode build during development.
+This doesn't affect the signed release DMG.
 
 **Notifications require a real code signature.** The released DMG is
 properly signed and this just works. If you're building from source

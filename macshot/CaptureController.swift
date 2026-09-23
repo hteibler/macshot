@@ -24,7 +24,7 @@ final class CaptureController {
         UNUserNotificationCenter.current().delegate = CaptureNotificationDelegate.shared
 
         let windowManager = HotKeyManager(id: 1) { [weak self] in
-            Task { await self?.handleHotKey(capture: WindowCapture.captureFocusedWindow) }
+            Task { await self?.handleWindowHotKey() }
         }
         windowHotKeyManager = windowManager
         applyWindowHotKey(settings.hotKey)
@@ -74,6 +74,13 @@ final class CaptureController {
         guard hotKey != registeredRegionHotKey else { return }
         registeredRegionHotKey = hotKey
         regionHotKeyManager?.update(keyCode: hotKey.keyCode, modifiers: hotKey.modifiers)
+    }
+
+    private func handleWindowHotKey() async {
+        let contentOnly = settings.browserContentOnly
+        await handleHotKey {
+            try await WindowCapture.captureFocusedWindow(contentOnly: contentOnly)
+        }
     }
 
     private func handleHotKey(capture: @escaping () async throws -> WindowCaptureResult) async {
@@ -157,6 +164,15 @@ final class CaptureController {
         let url = dir.appendingPathComponent(fileName)
         let data = try ImageEncoder.encode(result.image, format: format, jpegQuality: settings.jpegQuality)
         try data.write(to: url)
+
+        // Best-effort: named after the destination folder itself, so a
+        // capture's URL is easy to find next to it. Not critical enough to
+        // fail the whole save over.
+        if let browserURL = result.browserURL {
+            let urlFileURL = dir.appendingPathComponent(dir.lastPathComponent).appendingPathExtension("txt")
+            try? (browserURL + "\n").write(to: urlFileURL, atomically: true, encoding: .utf8)
+        }
+
         return url
     }
 

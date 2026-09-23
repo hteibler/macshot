@@ -53,9 +53,17 @@ struct HelpView: View {
                     Divider()
                         .padding(.vertical, 4)
 
+                    Text("Browser Content Only")
+                        .font(.headline)
+                    Text("Settings → Behavior → \"Browser Content Only\" (also toggleable from the menu bar dropdown) limits the Window hotkey to just a browser's web page content — no tab bar, bookmarks bar, URL bar, or window border. Only applies to window captures; Full Screen and Region are unaffected. The first capture with this enabled prompts for Accessibility permission (System Settings → Privacy & Security → Accessibility); until granted, or for non-browser windows, the full window is captured instead.")
+                        .foregroundStyle(.secondary)
+
+                    Divider()
+                        .padding(.vertical, 4)
+
                     Text("Menu bar & notifications")
                         .font(.headline)
-                    Text("The menu bar dropdown has \"Open Last Screenshot\", \"Open Last in Finder\", and \"Open Root Folder\" shortcuts. Clicking a save notification also opens that screenshot — enable \"Open Screenshot on Click\" in Settings → Notifications. Both use the same configurable app (or the system default).")
+                    Text("The menu bar dropdown has \"Open Last Screenshot\", \"Open Last in Finder\", and \"Open Root Folder\" shortcuts, plus a \"Browser Content Only\" checkbox that mirrors the Settings → Behavior toggle of the same name. Clicking a save notification also opens that screenshot — enable \"Open Screenshot on Click\" in Settings → Notifications. Both use the same configurable app (or the system default).")
                         .foregroundStyle(.secondary)
                 }
             }
