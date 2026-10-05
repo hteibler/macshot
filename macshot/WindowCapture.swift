@@ -1,4 +1,5 @@
 import AppKit
+import ApplicationServices
 import ScreenCaptureKit
 
 enum WindowCaptureError: Error {
@@ -30,9 +31,21 @@ enum WindowCapture {
 
         let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
 
-        guard let window = content.windows.first(where: {
+        let candidates = content.windows.filter {
             $0.owningApplication?.processID == frontmostPID && $0.isOnScreen && $0.windowLayer == 0
-        }) else {
+        }
+        // An app can own several on-screen windows (e.g. Teams chat windows
+        // alongside the screen-sharing window); the first in z-order isn't
+        // necessarily the focused one, so match the Accessibility focused
+        // window's frame when possible.
+        let focusedFrame = focusedWindowFrame(forPID: frontmostPID)
+        guard let window = candidates.first(where: { candidate in
+            guard let focusedFrame else { return false }
+            return abs(candidate.frame.origin.x - focusedFrame.origin.x) < 2
+                && abs(candidate.frame.origin.y - focusedFrame.origin.y) < 2
+                && abs(candidate.frame.width - focusedFrame.width) < 2
+                && abs(candidate.frame.height - focusedFrame.height) < 2
+        }) ?? candidates.first else {
             throw WindowCaptureError.noFocusedWindow
         }
 
@@ -77,6 +90,29 @@ enum WindowCapture {
             appName: window.owningApplication?.applicationName ?? "",
             browserURL: browserURL
         )
+    }
+
+    /// Frame of `pid`'s focused window via Accessibility, in the same
+    /// top-left-origin global space as `SCWindow.frame`. nil if Accessibility
+    /// isn't granted or the lookup fails (callers fall back to z-order).
+    private static func focusedWindowFrame(forPID pid: pid_t) -> CGRect? {
+        guard AccessibilityPermission.isGranted else { return nil }
+        let app = AXUIElementCreateApplication(pid)
+        var windowRef: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &windowRef) == .success,
+              let windowRef, CFGetTypeID(windowRef) == AXUIElementGetTypeID() else { return nil }
+        let window = windowRef as! AXUIElement
+
+        var positionRef: CFTypeRef?
+        var sizeRef: CFTypeRef?
+        var origin = CGPoint.zero
+        var size = CGSize.zero
+        guard AXUIElementCopyAttributeValue(window, kAXPositionAttribute as CFString, &positionRef) == .success,
+              AXUIElementCopyAttributeValue(window, kAXSizeAttribute as CFString, &sizeRef) == .success,
+              let positionRef, let sizeRef,
+              AXValueGetValue(positionRef as! AXValue, .cgPoint, &origin),
+              AXValueGetValue(sizeRef as! AXValue, .cgSize, &size) else { return nil }
+        return CGRect(origin: origin, size: size)
     }
 
     /// Captures the whole display currently under the mouse cursor (falls
